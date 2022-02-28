@@ -1,9 +1,13 @@
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.Scanner;
+import java.io.File;
 
 public class cryptAnalysis {
-    public static void main(String[] args) {
-        HashMap<Character, Character> k = randomAlphabet();
-        System.out.println(translate(k, "blahblahblah", true).x);
+    public static void main(String[] args) throws FileNotFoundException {
+        ArrayList<String> words = wordsFromFile("englwords.txt");
+        System.out.println(words.get(5));
+        System.out.println(words.size());
     }
 
     // generate a random monoalphabetic cipher
@@ -17,9 +21,7 @@ public class cryptAnalysis {
         for(char c : primLetters) {
             letters.add(c);
             randLetters.add(c);
-
         }
-
         Collections.shuffle(randLetters);
 
         for(int i = 0; i < 26; i++){
@@ -31,7 +33,7 @@ public class cryptAnalysis {
     // encrypt or decrypt given text with given monoalphabetic cipher
     public static Tuple<String, boolean[]> translate(HashMap<Character, Character> alphabet, String text, boolean decrypt) {
         StringBuilder translatedText = new StringBuilder();
-        HashMap<Character, Character> alph = alphabet;
+        HashMap<Character, Character> alph = decrypt? invertAlphabet(alphabet): alphabet;
         boolean[] translatedChars = new boolean[text.length()];
         for(int i = 0; i < text.length(); i++){
             // pass along characters for which they key does not have a value
@@ -50,7 +52,7 @@ public class cryptAnalysis {
     }
 
     // returns number of identifiable words in a given string
-    public int numWords(String text, int[][] trie) {
+    public static int numWords(String text, int[][] trie) {
         int total = 0;
         int n = 0;
 
@@ -72,5 +74,34 @@ public class cryptAnalysis {
             }
         }
         return total;
+    }
+
+    // takes a Hashmap and swaps keys and values
+    public static HashMap<Character, Character> invertAlphabet(HashMap<Character, Character> alph){
+        HashMap<Character, Character> newAlph = new HashMap<>();
+        for(Character k : alph.keySet()){
+            newAlph.put(alph.get(k), k);
+        }
+        return newAlph;
+    }
+
+
+    public static char[] toCharArray(Collection<Character> characters) {
+        Character[] charactersArray = characters.toArray(new Character[characters.size()]);
+        char[] chars = new char[charactersArray.length];
+        for(int i = 0; i < charactersArray.length; i++){
+            chars[i] = charactersArray[i];
+        }
+        return chars;
+    }
+
+    public static ArrayList<String> wordsFromFile(String fileName) throws FileNotFoundException {
+        ArrayList<String> words= new ArrayList<>();
+        File wordList = new File(fileName);
+        Scanner wordScan = new Scanner(wordList);
+        while(wordScan.hasNextLine()) {
+            words.add(wordScan.nextLine());
+        }
+        return words;
     }
 }

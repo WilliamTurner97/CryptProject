@@ -1,7 +1,13 @@
-import java.util.List;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class Trie {
+
+    public static void main(String[] args) throws FileNotFoundException {
+        ArrayList<String> words = cryptAnalysis.wordsFromFile("englwords.txt");
+        int[][] trie = makeTrie(words);
+        System.out.println(cryptAnalysis.numWords("hkbvt", trie));
+    }
 
     /*
     Matrix representation of graph for english language trie. Each node is stored as an int array.
@@ -25,12 +31,14 @@ public class Trie {
 
             // add nodes to complete the path of word in trie
             for(int i = 0; i < word.length(); i++) {
+                // alphabet index of current letter
                 int ln = word.charAt(i) - 97;
                 if(trie.get(n)[ln] == 0) {
-                    trie.add(new int[]{ln,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
-                    trieSize++;
-                    trie.get(n)[ln] = trieSize;
+                    int[] nextNode = new int[]{ln,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+                    nextNode[ln] = trieSize;
+                    trie.add(nextNode);
                     n = trieSize;
+                    trieSize++;
                 }
                 else {
                     n = trie.get(n)[ln];
