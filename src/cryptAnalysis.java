@@ -31,7 +31,9 @@ public class cryptAnalysis {
     }
 
     // encrypt or decrypt given text with given monoalphabetic cipher
-    public static Tuple<String, boolean[]> translate(HashMap<Character, Character> alphabet, String text, boolean decrypt) {
+    public static Tuple<String, boolean[]> translate(
+            HashMap<Character, Character> alphabet, String text, boolean decrypt) {
+
         StringBuilder translatedText = new StringBuilder();
         HashMap<Character, Character> alph = decrypt? invertAlphabet(alphabet): alphabet;
         boolean[] translatedChars = new boolean[text.length()];
@@ -76,6 +78,48 @@ public class cryptAnalysis {
         return total;
     }
 
+    public static int numRestarts(String text, int[][] trie) {
+        int restarts = 0;
+        int n = 0;
+
+        // match text to path through trie
+        for(int i = 0; i < text.length(); i++){
+            int ln = text.charAt(i) - 96;
+
+            // continue path if valid
+            if(trie[n][ln] != 0) {
+                n = trie[n][ln];
+            }
+            // otherwise, keep position in text but restart trie path from head node
+            else {
+                if(trie[n][27] == 0) {
+                    restarts++;
+                }
+                n = 0;
+            }
+        }
+        return restarts;
+    }
+
+    public static List<String> assembleFragments(String text, boolean[] translated) {
+        ArrayList<String> fragments = new ArrayList<>();
+
+        int i = 0;
+        while(i < text.length()) {
+            if(translated[i]) {
+                StringBuilder s = new StringBuilder();
+                while (i < text.length() && translated[i]) {
+                    s.append(text.charAt(i));
+                    i++;
+                }
+                fragments.add(s.toString());
+            }
+            i++;
+        }
+        return fragments;
+    }
+
+
     // takes a Hashmap and swaps keys and values
     public static HashMap<Character, Character> invertAlphabet(HashMap<Character, Character> alph){
         HashMap<Character, Character> newAlph = new HashMap<>();
@@ -94,6 +138,7 @@ public class cryptAnalysis {
         }
         return chars;
     }
+
 
     public static ArrayList<String> wordsFromFile(String fileName) throws FileNotFoundException {
         ArrayList<String> words= new ArrayList<>();

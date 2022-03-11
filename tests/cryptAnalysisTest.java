@@ -1,4 +1,7 @@
 import org.junit.jupiter.api.Test;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,6 +10,7 @@ import java.util.Arrays;
 class cryptAnalysisTest {
 
     static Random r = new Random();
+
 
     @Test
     void randomAlphabet() {
@@ -26,6 +30,22 @@ class cryptAnalysisTest {
 
     @Test
     void numWords() {
+    }
+
+    @Test
+    void numRestarts() throws FileNotFoundException {
+        ArrayList<String> words = cryptAnalysis.wordsFromFile("englwords.txt");
+        int[][] trie = Trie.makeTrie(words);
+        for (int i = 0; i < 100; i++) {
+            assertEquals(cryptAnalysis.numRestarts(
+                    words.get(r.nextInt(0, words.size())).toString(), trie), 0);
+        }
+    }
+
+    @Test
+    void assembleFragments() {
+        String text = "abcdefg";
+        boolean[] translated = {true, false, true, true, false, true, true};
     }
 
     @Test
