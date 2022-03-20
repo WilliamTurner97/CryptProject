@@ -8,13 +8,14 @@ class KeyTreeNodeTest {
 
     static Random r = new Random();
     String sampleText = "iamtheverymodelofamodernmajorgeneralihaveinformationvegetableanimalandmineral";
+    int[][] trie = Trie.makeTrie(Trie.wordsFromFile("englwords2.txt"));
 
-    @Test
-    void KeyTreeNode() throws FileNotFoundException {
+    KeyTreeNodeTest() throws FileNotFoundException {
     }
 
+
     @Test
-    void setAlph() throws FileNotFoundException {
+    void setAlph(){
         HashMap<Character, Character> a1 = new HashMap<>();
         char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
         char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
@@ -32,11 +33,11 @@ class KeyTreeNodeTest {
         Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a1,
-                cryptAnalysis.assembleFragments(samplePartialDecrypt.x, samplePartialDecrypt.y, true));
+                cryptAnalysis.assembleFragments(samplePartialDecrypt.x, samplePartialDecrypt.y, true), trie);
     }
 
     @Test
-    void randAlph() throws FileNotFoundException {
+    void randAlph() {
         HashMap<Character, Character> a2 = cryptAnalysis.randomAlphabet();
         Tuple<String, boolean[]> randomEncrypt = cryptAnalysis.translate(a2, sampleText, false);
 
@@ -46,11 +47,11 @@ class KeyTreeNodeTest {
         Tuple<String, boolean[]> randomDecrypt = cryptAnalysis.translate(a2, randomEncrypt.x, true);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a2,
-                cryptAnalysis.assembleFragments(randomDecrypt.x, randomDecrypt.y, true));
+                cryptAnalysis.assembleFragments(randomDecrypt.x, randomDecrypt.y, true), trie);
     }
 
     @Test
-    void expand() throws FileNotFoundException {
+    void expand() {
         HashMap<Character, Character> a1 = new HashMap<>();
         char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
         char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
@@ -68,8 +69,9 @@ class KeyTreeNodeTest {
         Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
         List<String> remainingFragments = cryptAnalysis.assembleFragments(samplePartialDecrypt.x, samplePartialDecrypt.y, false);
 
-        KeyTreeNode ktn1 = new KeyTreeNode(null, a1, remainingFragments);
-        ktn1.expand(cryptAnalysis.mostCommonChar(remainingFragments.toArray(new String[0])), remainingFragments, new ArrayList<KeyTreeNode>());
+        KeyTreeNode ktn1 = new KeyTreeNode(null, a1, remainingFragments, trie);
+        ktn1.expand(cryptAnalysis.mostCommonChar(remainingFragments.toArray(new String[0])),
+                remainingFragments, new ArrayList<KeyTreeNode>(), trie);
     }
 
     @Test

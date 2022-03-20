@@ -17,7 +17,7 @@ class TrieTest {
     @Test
     void makeTrie(){
         for(int i = 0; i < 50; i++) {
-            System.out.println(Arrays.toString(trie[i]));
+            //System.out.println(Arrays.toString(trie[i]));
         }
     }
 

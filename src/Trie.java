@@ -11,11 +11,9 @@ public class Trie {
     public static void main(String[] args) throws IOException {
         ArrayList<String> words = wordsFromFile("englwords2.txt");
         int[][] trie = makeTrie(words);
-        //trieToFile(trie);
-        //int[][] trie2 = trieFromFile("testFile.txt");
     }
 
-
+    // return file contents as list of string representations of each line
     public static ArrayList<String> wordsFromFile(String fileName) throws FileNotFoundException {
         ArrayList<String> words= new ArrayList<>();
         File wordList = new File(fileName);
@@ -26,6 +24,7 @@ public class Trie {
         return words;
     }
 
+    // create a trie from corresponding representation in a text file
     public static int[][] trieFromFile(String fileName) throws FileNotFoundException {
 
         ArrayList<String> nodeStrings = wordsFromFile(fileName);
@@ -41,6 +40,7 @@ public class Trie {
         return trie;
     }
 
+    // write the representation of a trie that can be read by trieFromFile to a text file
     public static void trieToFile(int[][] trie) throws IOException {
         FileWriter trieWriter = new FileWriter("testFile.txt");
         for(int i = 0; i < trie.length; i++){

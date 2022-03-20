@@ -87,6 +87,7 @@ public class cryptAnalysis {
 
         int i = 0;
         while(i < text.length()) {
+            // assemble each fragment and add to fragments
             if((translated[i] && translatedSection) || (!translated[i] && !translatedSection)) {
                 StringBuilder s = new StringBuilder();
                 while (i < text.length() && ((translated[i] && translatedSection) || (!translated[i] && !translatedSection))) {
