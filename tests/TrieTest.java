@@ -7,7 +7,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrieTest {
-    ArrayList<String> words = cryptAnalysis.wordsFromFile("englwords.txt");
+    ArrayList<String> words = Trie.wordsFromFile("englwords2.txt");
     int[][] trie = Trie.makeTrie(words);
 
     TrieTest() throws FileNotFoundException {
@@ -21,5 +21,12 @@ class TrieTest {
         }
     }
 
+    @Test
+    void trieFromFile() throws FileNotFoundException {
+        int[][] trie1 = Trie.trieFromFile("testFile.txt");
+        int[][] trie2 = Trie.makeTrie(Trie.wordsFromFile("englwords2.txt"));
+
+        assertArrayEquals(trie1, trie2);
+    }
 
 }

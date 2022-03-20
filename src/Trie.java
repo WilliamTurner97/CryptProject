@@ -1,15 +1,20 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Trie {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         ArrayList<String> words = wordsFromFile("englwords2.txt");
         int[][] trie = makeTrie(words);
-        //System.out.println(cryptAnalysis.numWords("hkbvt", trie));
+        //trieToFile(trie);
+        //int[][] trie2 = trieFromFile("testFile.txt");
     }
+
 
     public static ArrayList<String> wordsFromFile(String fileName) throws FileNotFoundException {
         ArrayList<String> words= new ArrayList<>();
@@ -19,6 +24,30 @@ public class Trie {
             words.add(wordScan.nextLine());
         }
         return words;
+    }
+
+    public static int[][] trieFromFile(String fileName) throws FileNotFoundException {
+
+        ArrayList<String> nodeStrings = wordsFromFile(fileName);
+
+        int[][] trie = new int[nodeStrings.size()][28];
+        for (int i = 0; i < nodeStrings.size(); i++) {
+            String[] numbers = nodeStrings.get(i).replaceAll("\\[", "")
+                    .replaceAll("]", "").replaceAll(" ", "").split(",");
+            for (int j = 0; j < 28; j++) {
+                trie[i][j] = Integer.parseInt(numbers[j]);
+            }
+        }
+        return trie;
+    }
+
+    public static void trieToFile(int[][] trie) throws IOException {
+        FileWriter trieWriter = new FileWriter("testFile.txt");
+        for(int i = 0; i < trie.length; i++){
+            trieWriter.write(Arrays.toString(trie[i]));
+            trieWriter.write("\n");
+        }
+        trieWriter.close();
     }
 
     /*
@@ -67,6 +96,6 @@ public class Trie {
             // Set node's 28th element to represent a word end
             trie.get(n)[27] = 1;
         }
-        return (trie.toArray(new int[28][0]));
+        return (trie.toArray(new int[0][0]));
     }
 }

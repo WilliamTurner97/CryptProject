@@ -2,12 +2,12 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.Scanner;
 import java.io.File;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class cryptAnalysis {
     public static void main(String[] args) throws FileNotFoundException {
-        ArrayList<String> words = wordsFromFile("englwords.txt");
-        System.out.println(words.get(5));
-        System.out.println(words.size());
+
     }
 
     // generate a random monoalphabetic cipher
@@ -78,37 +78,18 @@ public class cryptAnalysis {
         return total;
     }
 
-    public static int numRestarts(String text, int[][] trie) {
-        int restarts = 0;
-        int n = 0;
 
-        // match text to path through trie
-        for(int i = 0; i < text.length(); i++){
-            int ln = text.charAt(i) - 96;
-
-            // continue path if valid
-            if(trie[n][ln] != 0) {
-                n = trie[n][ln];
-            }
-            // otherwise, keep position in text but restart trie path from head node
-            else {
-                if(trie[n][27] == 0) {
-                    restarts++;
-                }
-                n = 0;
-            }
-        }
-        return restarts;
-    }
-
-    public static List<String> assembleFragments(String text, boolean[] translated) {
+    /* takes a string and boolean array, assembles chars for which corresponding boolean is true or false depending
+    on translatedSection parameter
+     */
+    public static List<String> assembleFragments(String text, boolean[] translated, boolean translatedSection) {
         ArrayList<String> fragments = new ArrayList<>();
 
         int i = 0;
         while(i < text.length()) {
-            if(translated[i]) {
+            if((translated[i] && translatedSection) || (!translated[i] && !translatedSection)) {
                 StringBuilder s = new StringBuilder();
-                while (i < text.length() && translated[i]) {
+                while (i < text.length() && ((translated[i] && translatedSection) || (!translated[i] && !translatedSection))) {
                     s.append(text.charAt(i));
                     i++;
                 }
@@ -117,6 +98,41 @@ public class cryptAnalysis {
             i++;
         }
         return fragments;
+    }
+
+    // counts frequencies of each char in a string
+    public static int[] charFrequencies(String text){
+        int[] frequencies = new int[26];
+        for (int i = 0; i < text.length(); i++) {
+            frequencies[(char) (text.charAt(i) - 97)] ++;
+        }
+        return frequencies;
+    }
+
+    // counts frequencies of each char across an array of strings
+    public static int[] charFrequencies(String[] fragments){
+        int[] frequencies = new int[26];
+        for (String fragment : fragments) {
+            int[] fragmentFrequencies = charFrequencies(fragment);
+            for (int i = 0; i < 26; i++) {
+                frequencies[i] = frequencies[i] + fragmentFrequencies[i];
+            }
+        }
+        return frequencies;
+    }
+
+    // finds the most common character in an array of strings
+    public static char mostCommonChar(String[] fragments) {
+        int[] frequencies = charFrequencies(fragments);
+        int best = 0;
+        int bestValue = frequencies[0];
+        for (int i = 0; i < 26; i++) {
+            if(frequencies[i] > bestValue) {
+                best = i;
+                bestValue = frequencies[i];
+            }
+        }
+        return((char) (best + 97));
     }
 
 
@@ -131,22 +147,13 @@ public class cryptAnalysis {
 
 
     public static char[] toCharArray(Collection<Character> characters) {
-        Character[] charactersArray = characters.toArray(new Character[characters.size()]);
+        Character[] charactersArray = characters.toArray(new Character[0]);
         char[] chars = new char[charactersArray.length];
         for(int i = 0; i < charactersArray.length; i++){
             chars[i] = charactersArray[i];
         }
         return chars;
+
     }
 
-
-    public static ArrayList<String> wordsFromFile(String fileName) throws FileNotFoundException {
-        ArrayList<String> words= new ArrayList<>();
-        File wordList = new File(fileName);
-        Scanner wordScan = new Scanner(wordList);
-        while(wordScan.hasNextLine()) {
-            words.add(wordScan.nextLine());
-        }
-        return words;
-    }
 }

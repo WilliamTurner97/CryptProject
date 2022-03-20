@@ -33,16 +33,6 @@ class cryptAnalysisTest {
     }
 
     @Test
-    void numRestarts() throws FileNotFoundException {
-        ArrayList<String> words = cryptAnalysis.wordsFromFile("englwords.txt");
-        int[][] trie = Trie.makeTrie(words);
-        for (int i = 0; i < 100; i++) {
-            assertEquals(cryptAnalysis.numRestarts(
-                    words.get(r.nextInt(0, words.size())).toString(), trie), 0);
-        }
-    }
-
-    @Test
     void assembleFragments() {
         String text = "abcdefg";
         boolean[] translated = {true, false, true, true, false, true, true};
@@ -53,17 +43,9 @@ class cryptAnalysisTest {
         HashMap<Character, Character> alph = cryptAnalysis.randomAlphabet();
         HashMap<Character, Character> invAlph = cryptAnalysis.invertAlphabet(alph);
 
-        char[] ak = cryptAnalysis.toCharArray(alph.keySet());
-        char[] iv = cryptAnalysis.toCharArray(invAlph.values());
-        char[] av = cryptAnalysis.toCharArray(alph.values());
-        char[] ik = cryptAnalysis.toCharArray(invAlph.keySet());
-        Arrays.sort(ak);
-        Arrays.sort(iv);
-        Arrays.sort(av);
-        Arrays.sort(ik);
-
-        assertArrayEquals(ak, iv);
-        assertArrayEquals(av, ik);
+        for(Character c : alph.keySet()){
+            assertEquals(c.charValue(), invAlph.get(alph.get(c)));
+        }
     }
 
     public static String randomString(int i) {
