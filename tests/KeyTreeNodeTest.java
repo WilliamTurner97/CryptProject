@@ -14,8 +14,8 @@ class KeyTreeNodeTest {
     }
 
 
-    @Test
-    void setAlph(){
+/*    @Test
+    void fixedAlph(){
         HashMap<Character, Character> a1 = new HashMap<>();
         char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
         char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
@@ -33,8 +33,9 @@ class KeyTreeNodeTest {
         Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a1,
-                cryptAnalysis.assembleFragments(samplePartialDecrypt.x, samplePartialDecrypt.y, true), trie);
-    }
+                cryptAnalysis.assembleFragments(samplePartialDecrypt, true), trie);
+    }*/
+/*
 
     @Test
     void randAlph() {
@@ -47,10 +48,11 @@ class KeyTreeNodeTest {
         Tuple<String, boolean[]> randomDecrypt = cryptAnalysis.translate(a2, randomEncrypt.x, true);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a2,
-                cryptAnalysis.assembleFragments(randomDecrypt.x, randomDecrypt.y, true), trie);
+                cryptAnalysis.assembleFragments(randomDecrypt, true), trie);
     }
+*/
 
-    @Test
+/*    @Test
     void expand() {
         HashMap<Character, Character> a1 = new HashMap<>();
         char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
@@ -67,12 +69,12 @@ class KeyTreeNodeTest {
         }
 
         Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
-        List<String> remainingFragments = cryptAnalysis.assembleFragments(samplePartialDecrypt.x, samplePartialDecrypt.y, false);
+        List<String> remainingFragments = cryptAnalysis.assembleFragments(samplePartialDecrypt, false);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a1, remainingFragments, trie);
         ktn1.expand(cryptAnalysis.mostCommonChar(remainingFragments.toArray(new String[0])),
                 remainingFragments, new ArrayList<KeyTreeNode>(), trie);
-    }
+    }*/
 
     @Test
     void charFrequencies(){

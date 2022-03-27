@@ -1,8 +1,6 @@
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 
 public class KeyTreeNode {
 
@@ -13,9 +11,10 @@ public class KeyTreeNode {
     double totalRestarts = 0;
     double improvedRestarts;
     double relativeImprovement;
+    double numwords;
 
     public KeyTreeNode(KeyTreeNode parent, HashMap<Character, Character> alphabet,
-                       List<String> textFragments, int[][] trie) {
+                       String[] textFragments, int[][] trie) {
 
         this.parent = parent;
         this.alphabet = alphabet;
@@ -23,29 +22,32 @@ public class KeyTreeNode {
         // objective heuristic measurement
         for (String fragment: textFragments) {
             totalRestarts += numRestarts(fragment, trie);
+            numwords += cryptAnalysis.numWords(fragment, trie);
         }
 
         // relative heuristic measurement
         if(parent != null) {
-            improvedRestarts = totalRestarts - parent.getTotalRestarts();
-            relativeImprovement = totalRestarts/parent.getTotalRestarts();
+            improvedRestarts = parent.getTotalRestarts() - totalRestarts;
+            relativeImprovement = parent.getTotalRestarts()/totalRestarts;
         }
         else{
-            improvedRestarts = totalRestarts;
+            improvedRestarts = 0;
             relativeImprovement = 0;
         }
     }
 
     // create, evaluate, and sort nodes representing all possibilities for descendant nodes containing c
-    public void expand(Character c, List<String> textFragments, ArrayList<KeyTreeNode> bestNodes, int[][] trie) {
+    public void expand(Character c, String[] textFragments, ArrayList<KeyTreeNode> bestNodes, int[][] trie) {
         for (int i = 0; i < 26; i++) {
-            HashMap<Character, Character> newAlph = new HashMap<Character, Character>(alphabet);
-            newAlph.put((char) (i + 97), c);
-            KeyTreeNode k = new KeyTreeNode(this, newAlph, textFragments, trie);
-            children.add(k);
-            bestNodes.add(k);
+            if(true) {
+                HashMap<Character, Character> newAlph = new HashMap<>(alphabet);
+                newAlph.put((char) (i + 97), c);
+                KeyTreeNode k = new KeyTreeNode(this, newAlph, textFragments, trie);
+                children.add(k);
+                bestNodes.add(k);
+            }
         }
-        bestNodes.sort(Comparator.comparing(KeyTreeNode::getTotalRestarts));
+        bestNodes.sort(Comparator.comparing(KeyTreeNode::getAlphabetSize));
     }
 
     // number of times matching text to lines through trie has to restart without a word end
@@ -75,6 +77,10 @@ public class KeyTreeNode {
 
     // setters and getters
 
+    public HashMap<Character, Character> getAlphabet() {
+        return alphabet;
+    }
+
     public KeyTreeNode getParent() {
         return parent;
     }
@@ -89,5 +95,21 @@ public class KeyTreeNode {
 
     public double getTotalRestarts() {
         return totalRestarts;
+    }
+
+    public double getImprovedRestarts() {
+        return improvedRestarts;
+    }
+
+    public double getRelativeImprovement() {
+        return relativeImprovement;
+    }
+
+    public double getNumwords() {
+        return numwords;
+    }
+
+    public int getAlphabetSize() {
+        return alphabet.size();
     }
 }

@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class Trie {
 
     public static void main(String[] args) throws IOException {
-        ArrayList<String> words = wordsFromFile("englwords2.txt");
-        int[][] trie = makeTrie(words);
+        //ArrayList<String> words = wordsFromFile("englwords2.txt");
+        //int[][] trie = makeTrie(words);
     }
 
     // return file contents as list of string representations of each line
@@ -43,8 +43,8 @@ public class Trie {
     // write the representation of a trie that can be read by trieFromFile to a text file
     public static void trieToFile(int[][] trie) throws IOException {
         FileWriter trieWriter = new FileWriter("testFile.txt");
-        for(int i = 0; i < trie.length; i++){
-            trieWriter.write(Arrays.toString(trie[i]));
+        for (int[] ints : trie) {
+            trieWriter.write(Arrays.toString(ints));
             trieWriter.write("\n");
         }
         trieWriter.close();

@@ -1,56 +1,50 @@
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.Scanner;
-import java.io.File;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class cryptAnalysis {
     public static void main(String[] args) throws FileNotFoundException {
-
     }
 
-    // generate a random monoalphabetic cipher
-    public static HashMap<Character, Character> randomAlphabet(){
 
-        HashMap<Character, Character> hm = new HashMap<Character, Character>();
-        char[] primLetters = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-        List<Character> letters = new ArrayList<>();
-        List<Character> randLetters = new ArrayList<>();
+/*    public static String loop(int restarts, int iterations, HashMap<Character, Character> alph, String encryptedText) throws FileNotFoundException {
 
-        for(char c : primLetters) {
-            letters.add(c);
-            randLetters.add(c);
+        int[][] trie = Trie.makeTrie(Trie.wordsFromFile("englwords2.txt"));
+        KeyTreeNode k = new KeyTreeNode(null, alph, assembleFragments(translate(alph, encryptedText, false), true), trie);
+        ArrayList<KeyTreeNode> bestNodes = new ArrayList<>();
+
+        int i = 0;
+        while(k.getTotalRestarts() > restarts && i < iterations) {
+            Tuple<String, boolean[]> t = translate(k.getAlphabet(), encryptedText, false);
+            k.expand(mostCommonChar(assembleFragments(t, false).toArray(new String[0])),
+                    assembleFragments(t, true), bestNodes, trie);
+            k = bestNodes.get(bestNodes.size()-1);
+            i += 1;
         }
-        Collections.shuffle(randLetters);
 
-        for(int i = 0; i < 26; i++){
-            hm.put(letters.get(i), randLetters.get(i));
-        }
-        return hm;
-    }
+        return translate(k.getAlphabet(), encryptedText, true).x;
+    }*/
 
     // encrypt or decrypt given text with given monoalphabetic cipher
-    public static Tuple<String, boolean[]> translate(
-            HashMap<Character, Character> alphabet, String text, boolean decrypt) {
+    public static Tuple<String, boolean[]> translate(Tuple<char[], char[]> alphabet, String text) {
 
-        StringBuilder translatedText = new StringBuilder();
-        HashMap<Character, Character> alph = decrypt? invertAlphabet(alphabet): alphabet;
+        char[] translatedText = new char[text.length()];
         boolean[] translatedChars = new boolean[text.length()];
+        char[] textChars = alphabet.x;
+        char[] correspondingChars = alphabet.y;
+
         for(int i = 0; i < text.length(); i++){
-            // pass along characters for which they key does not have a value
-            if(alph.get(text.charAt(i)) == null){
-                translatedText.append(text.charAt(i));
+            // pass along chars for which they key does not have a value
+            if(textChars[text.charAt(i) - 97] == '`'){
+                translatedText[i] = (text.charAt(i));
                 translatedChars[i] = false;
             }
-            // otherwise, swap for corresponding character in key
+            // otherwise, swap for corresponding char in alphabet
             else{
-                translatedText.append(alph.get(text.charAt(i)));
+                translatedText[i] = correspondingChars[text.charAt(i) - 97];
                 translatedChars[i] = true;
             }
         }
-
-        return(new Tuple<String, boolean[]>(translatedText.toString(), translatedChars));
+        return(new Tuple<>(new String(translatedText), translatedChars));
     }
 
     // returns number of identifiable words in a given string
@@ -78,27 +72,26 @@ public class cryptAnalysis {
         return total;
     }
 
-
     /* takes a string and boolean array, assembles chars for which corresponding boolean is true or false depending
     on translatedSection parameter
      */
-    public static List<String> assembleFragments(String text, boolean[] translated, boolean translatedSection) {
+    public static String[] assembleFragments(Tuple<String, boolean[]> partial, boolean translatedSection) {
         ArrayList<String> fragments = new ArrayList<>();
 
         int i = 0;
-        while(i < text.length()) {
+        while(i < partial.x.length()) {
             // assemble each fragment and add to fragments
-            if((translated[i] && translatedSection) || (!translated[i] && !translatedSection)) {
+            if((partial.y[i] && translatedSection) || (!partial.y[i] && !translatedSection)) {
                 StringBuilder s = new StringBuilder();
-                while (i < text.length() && ((translated[i] && translatedSection) || (!translated[i] && !translatedSection))) {
-                    s.append(text.charAt(i));
+                while (i < partial.x.length() && ((partial.y[i] && translatedSection) || (!partial.y[i] && !translatedSection))) {
+                    s.append(partial.x.charAt(i));
                     i++;
                 }
                 fragments.add(s.toString());
             }
             i++;
         }
-        return fragments;
+        return fragments.toArray(new String[0]);
     }
 
     // counts frequencies of each char in a string
@@ -136,16 +129,13 @@ public class cryptAnalysis {
         return((char) (best + 97));
     }
 
-
-    // takes a Hashmap and swaps keys and values
-    public static HashMap<Character, Character> invertAlphabet(HashMap<Character, Character> alph){
-        HashMap<Character, Character> newAlph = new HashMap<>();
-        for(Character k : alph.keySet()){
-            newAlph.put(alph.get(k), k);
+    public static Tuple<char[], char[]> invertAlphabet(Tuple<char[], char[]> alph){
+        char[] rearranged = new char[alph.x.length];
+        for(int i = 0; i < alph.x.length; i++){
+            rearranged[alph.y[i] - 97] = alph.x[i];
         }
-        return newAlph;
+        return new Tuple<char[], char[]>(alph.x, rearranged);
     }
-
 
     public static char[] toCharArray(Collection<Character> characters) {
         Character[] charactersArray = characters.toArray(new Character[0]);
@@ -156,5 +146,4 @@ public class cryptAnalysis {
         return chars;
 
     }
-
 }
