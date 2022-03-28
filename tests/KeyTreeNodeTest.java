@@ -14,67 +14,51 @@ class KeyTreeNodeTest {
     }
 
 
-/*    @Test
-    void fixedAlph(){
-        HashMap<Character, Character> a1 = new HashMap<>();
-        char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-        char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
+    @Test
+    void expand() {
 
-        for(int i = 0; i < 26; i++){
-            a1.put(letters1[i], letters2[i]);
-        }
-
-        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText, false);
+        Tuple<char[], char[]> a1 = new Tuple<>("abcdefghijklmnopqrstuvwxyz".toCharArray(), "bcdefghijklmnopqrstuvwxyza".toCharArray());
+        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText);
+        Tuple<char[], char[]> a2 = cryptAnalysis.invertAlphabet(a1);
 
         for(int i = 0; i < 10; i++) {
-            a1.remove((char) (i + 97));
+            a2.y[i] = '`';
         }
 
-        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
-
-        KeyTreeNode ktn1 = new KeyTreeNode(null, a1,
-                cryptAnalysis.assembleFragments(samplePartialDecrypt, true), trie);
-    }*/
-/*
-
-    @Test
-    void randAlph() {
-        HashMap<Character, Character> a2 = cryptAnalysis.randomAlphabet();
-        Tuple<String, boolean[]> randomEncrypt = cryptAnalysis.translate(a2, sampleText, false);
-
-        for(int i = 0; i < r.nextInt(5, 20); i++) {
-            a2.remove((char) (r.nextInt(97, 122)));
-        }
-        Tuple<String, boolean[]> randomDecrypt = cryptAnalysis.translate(a2, randomEncrypt.x, true);
+        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a2, sampleFullEncrypt.x);
 
         KeyTreeNode ktn1 = new KeyTreeNode(null, a2,
-                cryptAnalysis.assembleFragments(randomDecrypt, true), trie);
-    }
-*/
+                cryptAnalysis.assembleFragments(samplePartialDecrypt, true), trie);
 
-/*    @Test
-    void expand() {
-        HashMap<Character, Character> a1 = new HashMap<>();
-        char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-        char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
-
-        for(int i = 0; i < 26; i++){
-            a1.put(letters1[i], letters2[i]);
+        ArrayList<KeyTreeNode> bestNodes = new ArrayList<>();
+        ktn1.expand(samplePartialDecrypt, bestNodes, trie);
+        for (KeyTreeNode k : bestNodes) {
+            System.out.println(Arrays.toString(k.getAlphabet().y));
         }
+    }
 
-        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText, false);
+    @Test
+    void randExpand() {
+        Tuple<char[], char[]> a1 = new Tuple<>("abcdefghijklmnopqrstuvwxyz".toCharArray(), "bcdefghijklmnopqrstuvwxyza".toCharArray());
+        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText);
+        Tuple<char[], char[]> a2 = cryptAnalysis.invertAlphabet(a1);
 
         for(int i = 0; i < 10; i++) {
-            a1.remove((char) (i + 97));
+            a2.y[r.nextInt(26)] = '`';
         }
 
-        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
-        List<String> remainingFragments = cryptAnalysis.assembleFragments(samplePartialDecrypt, false);
+        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a2, sampleFullEncrypt.x);
 
-        KeyTreeNode ktn1 = new KeyTreeNode(null, a1, remainingFragments, trie);
-        ktn1.expand(cryptAnalysis.mostCommonChar(remainingFragments.toArray(new String[0])),
-                remainingFragments, new ArrayList<KeyTreeNode>(), trie);
-    }*/
+        KeyTreeNode ktn1 = new KeyTreeNode(null, a2,
+                cryptAnalysis.assembleFragments(samplePartialDecrypt, true), trie);
+
+        ArrayList<KeyTreeNode> bestNodes = new ArrayList<>();
+        ktn1.expand(samplePartialDecrypt, bestNodes, trie);
+        System.out.println(Arrays.toString(a2.y));
+        for (KeyTreeNode k : bestNodes) {
+            System.out.println(Arrays.toString(k.getAlphabet().y));
+        }
+    }
 
     @Test
     void charFrequencies(){

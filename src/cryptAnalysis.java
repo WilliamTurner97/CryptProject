@@ -6,23 +6,24 @@ public class cryptAnalysis {
     }
 
 
-/*    public static String loop(int restarts, int iterations, HashMap<Character, Character> alph, String encryptedText) throws FileNotFoundException {
+    public static KeyTreeNode loop(int restarts, int iterations, Tuple<char[], char[]> alph, String encryptedText) throws FileNotFoundException {
 
         int[][] trie = Trie.makeTrie(Trie.wordsFromFile("englwords2.txt"));
-        KeyTreeNode k = new KeyTreeNode(null, alph, assembleFragments(translate(alph, encryptedText, false), true), trie);
+        KeyTreeNode k = new KeyTreeNode(null, alph, assembleFragments(translate(alph, encryptedText), true), trie);
         ArrayList<KeyTreeNode> bestNodes = new ArrayList<>();
 
         int i = 0;
-        while(k.getTotalRestarts() > restarts && i < iterations) {
-            Tuple<String, boolean[]> t = translate(k.getAlphabet(), encryptedText, false);
-            k.expand(mostCommonChar(assembleFragments(t, false).toArray(new String[0])),
-                    assembleFragments(t, true), bestNodes, trie);
-            k = bestNodes.get(bestNodes.size()-1);
+        while (k.getTotalRestarts() > restarts && i < iterations) {
+            Tuple<String, boolean[]> t = translate(k.getAlphabet(), encryptedText);
+            k.expand(t, bestNodes, trie);
+            //k = bestNodes.get(bestNodes.size()-1);
+            k = bestNodes.get(0);
+            bestNodes.sort(Comparator.comparing(KeyTreeNode::getTotalRestarts));
             i += 1;
         }
 
-        return translate(k.getAlphabet(), encryptedText, true).x;
-    }*/
+        return k;
+    }
 
     // encrypt or decrypt given text with given monoalphabetic cipher
     public static Tuple<String, boolean[]> translate(Tuple<char[], char[]> alphabet, String text) {
@@ -34,7 +35,7 @@ public class cryptAnalysis {
 
         for(int i = 0; i < text.length(); i++){
             // pass along chars for which they key does not have a value
-            if(textChars[text.charAt(i) - 97] == '`'){
+            if(correspondingChars[text.charAt(i) - 97] == '`'){
                 translatedText[i] = (text.charAt(i));
                 translatedChars[i] = false;
             }
@@ -71,6 +72,44 @@ public class cryptAnalysis {
         }
         return total;
     }
+
+    public static char bestExpansion(Tuple<String, boolean[]> partial, Tuple<char[], char[]> alph) {
+        char best = 'a';
+        boolean[] translated = partial.y;
+        ArrayList<Character> bestChars = new ArrayList<>();
+
+        for (int i = 0; i < translated.length; i++) {
+            if(!translated[i]) {
+                if((i < translated.length - 1 && translated[i + 1]) || (i > 0 && translated[i - 1])) {
+                    bestChars.add(partial.x.charAt(i));
+                }
+            }
+        }
+
+        int bestScore = 0;
+        for (Character c :
+                bestChars) {
+            Tuple<char[], char[]> newAlph = new Tuple<char[], char[]>(alph.x, Arrays.copyOf(alph.y, alph.y.length));
+            newAlph.y[c.charValue() - 97] = 'a';
+            int df = defragmentationScore(assembleFragments(translate(newAlph, partial.x), true));
+            if(df > bestScore){
+                best = c.charValue();
+            }
+        }
+
+
+        return best;
+    }
+
+    public static int defragmentationScore(String[] fragments){
+        int x = 0;
+        for (String f :
+                fragments) {
+            x += ((f.length() ^ 2) - 1);
+        }
+        return x;
+    }
+
 
     /* takes a string and boolean array, assembles chars for which corresponding boolean is true or false depending
     on translatedSection parameter
@@ -145,5 +184,13 @@ public class cryptAnalysis {
         }
         return chars;
 
+    }
+
+    public static ArrayList<Character> toCharacterArray(char[] chars) {
+        ArrayList<Character> Characters = new ArrayList<>();
+        for (char c : chars) {
+            Characters.add(c);
+        }
+        return Characters;
     }
 }

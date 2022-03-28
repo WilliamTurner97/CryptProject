@@ -17,29 +17,44 @@ class cryptAnalysisTest {
     }
 
 
-/*    @Test
+    @Test
     void loop() throws FileNotFoundException {
-        HashMap<Character, Character> a1 = new HashMap<>();
-        char[] letters1 = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-        char[] letters2 = "bcdefghijklmnopqrstuvwxyza".toCharArray();
 
-        for(int i = 0; i < 26; i++){
-            a1.put(letters1[i], letters2[i]);
-        }
-
-        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText, false);
+        Tuple<char[], char[]> a1 = new Tuple<>("abcdefghijklmnopqrstuvwxyz".toCharArray(), "bcdefghijklmnopqrstuvwxyza".toCharArray());
+        Tuple<String, boolean[]> sampleFullEncrypt = cryptAnalysis.translate(a1, sampleText);
+        Tuple<char[], char[]> a2 = cryptAnalysis.invertAlphabet(a1);
+        Tuple<char[], char[]> a3 = new Tuple<>(a2.x, Arrays.copyOf(a2.x, a2.x.length));
 
         for(int i = 0; i < 10; i++) {
-            a1.remove((char) (i + 97));
+            a2.y[i] = '`';
         }
 
-        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a1, sampleFullEncrypt.x, true);
+        Tuple<String, boolean[]> samplePartialDecrypt = cryptAnalysis.translate(a2, sampleFullEncrypt.x);
 
-        KeyTreeNode ktn1 = new KeyTreeNode(null, a1,
+        KeyTreeNode ktn1 = new KeyTreeNode(null, a2,
                 cryptAnalysis.assembleFragments(samplePartialDecrypt, true), trie);
 
-         System.out.println(cryptAnalysis.loop(10, 1000, a1, sampleText));
-    }*/
+         KeyTreeNode k = cryptAnalysis.loop(10, 1000, a2, sampleFullEncrypt.x);
+        System.out.println(cryptAnalysis.translate(k.getAlphabet(), sampleFullEncrypt.x).x);
+        System.out.println("total restarts : " + k.getTotalRestarts());
+        System.out.println("improved restarts : " + k.getImprovedRestarts());
+        System.out.println("relative improvement : " + k.getRelativeImprovement());
+        System.out.println("num words : " + k.getNumwords());
+        int numCharsTranslated = 0;
+        for (int i = 0; i < 26; i++) {
+            if(k.getAlphabet().y[i] != '`'){
+                numCharsTranslated +=1;
+            }
+        }
+        System.out.println("num chars translated : " + (numCharsTranslated - 16));
+        int numCharsWrong = 0;
+        for (int i = 0; i < 26; i++) {
+            if(k.getAlphabet().y[i] == a3.y[i]){
+                numCharsWrong += 1;
+            }
+        }
+        System.out.println("num chars wrong : " + numCharsWrong);
+    }
 
 
     @Test

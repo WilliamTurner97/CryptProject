@@ -1,10 +1,12 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.IntStream;
 
 public class KeyTreeNode {
 
-    HashMap<Character, Character> alphabet;
+    Tuple<char[], char[]> alphabet;
     KeyTreeNode parent;
     ArrayList<KeyTreeNode> children = new ArrayList<>();
 
@@ -13,14 +15,13 @@ public class KeyTreeNode {
     double relativeImprovement;
     double numwords;
 
-    public KeyTreeNode(KeyTreeNode parent, HashMap<Character, Character> alphabet,
-                       String[] textFragments, int[][] trie) {
+    public KeyTreeNode(KeyTreeNode parent, Tuple<char[], char[]> alphabet, String[] translatedFragments, int[][] trie) {
 
         this.parent = parent;
         this.alphabet = alphabet;
 
         // objective heuristic measurement
-        for (String fragment: textFragments) {
+        for (String fragment: translatedFragments) {
             totalRestarts += numRestarts(fragment, trie);
             numwords += cryptAnalysis.numWords(fragment, trie);
         }
@@ -31,24 +32,34 @@ public class KeyTreeNode {
             relativeImprovement = parent.getTotalRestarts()/totalRestarts;
         }
         else{
-            improvedRestarts = 0;
-            relativeImprovement = 0;
+            improvedRestarts = 1;
+            relativeImprovement = 1.5;
         }
     }
 
     // create, evaluate, and sort nodes representing all possibilities for descendant nodes containing c
-    public void expand(Character c, String[] textFragments, ArrayList<KeyTreeNode> bestNodes, int[][] trie) {
+    public void expand(Tuple<String, boolean[]> partial, ArrayList<KeyTreeNode> bestNodes, int[][] trie) {
+
+        char c = cryptAnalysis.bestExpansion(partial, alphabet);
+        ArrayList<Character> taken = cryptAnalysis.toCharacterArray(alphabet.y);
+
         for (int i = 0; i < 26; i++) {
-            if(true) {
-                HashMap<Character, Character> newAlph = new HashMap<>(alphabet);
-                newAlph.put((char) (i + 97), c);
-                KeyTreeNode k = new KeyTreeNode(this, newAlph, textFragments, trie);
+            if(!taken.contains((char) (i + 97))) {
+               Tuple<char[], char[]> newAlph = new Tuple<char[], char[]>(
+                       Arrays.copyOf(alphabet.x, alphabet.x.length), Arrays.copyOf(alphabet.y, alphabet.y.length));
+               newAlph.x[c - 97] = c;
+               newAlph.y[c - 97] = ((char) (i + 97));
+                KeyTreeNode k = new KeyTreeNode(this, newAlph, cryptAnalysis.assembleFragments(partial, true), trie);
                 children.add(k);
                 bestNodes.add(k);
             }
         }
-        bestNodes.sort(Comparator.comparing(KeyTreeNode::getAlphabetSize));
+        //bestNodes.sort(Comparator.comparing(KeyTreeNode::getImprovedRestarts));
     }
+
+
+
+
 
     // number of times matching text to lines through trie has to restart without a word end
     public static double numRestarts(String text, int[][] trie) {
@@ -77,7 +88,7 @@ public class KeyTreeNode {
 
     // setters and getters
 
-    public HashMap<Character, Character> getAlphabet() {
+    public Tuple<char[], char[]> getAlphabet() {
         return alphabet;
     }
 
@@ -110,6 +121,6 @@ public class KeyTreeNode {
     }
 
     public int getAlphabetSize() {
-        return alphabet.size();
+        return alphabet.x.length;
     }
 }
